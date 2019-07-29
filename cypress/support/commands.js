@@ -23,3 +23,19 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('upload', ({ selector, name, type }) =>
+	cy
+		.fixture(name, 'base64')
+		.then(Cypress.Blob.base64StringToBlob)
+		.then(blob => {
+			const file = new File([blob], name, { type })
+			const dataTransfer = new DataTransfer()
+			dataTransfer.items.add(file)
+
+			return cy.get(selector).then($el => {
+				const rawDomElement = $el[0]
+				rawDomElement.files = dataTransfer.files
+			})
+		})
+)

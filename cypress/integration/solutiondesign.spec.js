@@ -35,24 +35,12 @@ describe('solutiondesign.com', () => {
 			.get('input[type=text]:eq(1)')
 			.type(EMAIL)
 
-		// File upload helper function
-		const upload = (selector, name, type) =>
-			cy
-				.fixture(name, 'base64')
-				.then(Cypress.Blob.base64StringToBlob)
-				.then(blob => {
-					const file = new File([blob], name, { type })
-					const dataTransfer = new DataTransfer()
-					dataTransfer.items.add(file)
-
-					return cy.get(selector).then($el => {
-						const rawDomElement = $el[0]
-						rawDomElement.files = dataTransfer.files
-					})
-				})
-
 		// Upload the file and click submit
-		upload('input[type=file]', 'resume.txt', 'text/plain')
+		cy.upload({
+			selector: 'input[type=file]',
+			name: 'resume.txt',
+			type: 'text/plain'
+		})
 			.get('button[type=submit]')
 			.click()
 			.wait('@postResume')
